@@ -9,20 +9,16 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    protected $table = 'schedule';
+
     protected $fillable = [
-        'mentor_id',
-        'schedule_time',
-        'is_booked',
-        'mentee_id',
+        'date',
+        'time',
+        'location',
     ];
 
-    public function mentor()
+    public function mentoringRequests()
     {
-        return $this->belongsTo(Mentor::class);
-    }
-
-    public function mentee()
-    {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(MentoringRequest::class);
     }
 }

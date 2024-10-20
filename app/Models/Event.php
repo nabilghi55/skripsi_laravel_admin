@@ -9,13 +9,17 @@ class Event extends Model
 {
     use HasFactory;
 
+    protected $table = 'events';
+
     protected $fillable = [
-        'title', 'waktu', 'lokasi', 'deskripsi', 'gambar'
+        'name',
+        'description',
+        'date',
+        'location',
     ];
 
-    // Relasi ke pendaftaran
     public function registrations()
     {
-        return $this->hasMany(Registration::class);
+        return $this->hasMany(EventRegistration::class);
     }
 }

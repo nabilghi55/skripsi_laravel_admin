@@ -5,20 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Mentor extends Model
+class JobVacancy extends Model
 {
     use HasFactory;
 
-    protected $table = 'mentor';
+    protected $table = 'job_vacancies';
 
     protected $fillable = [
         'user_id',
-        'photo',
-        'portfolio',
-        'current_job',
+        'title',
+        'company_name',
+        'company_logo',
+        'company_description',
+        'salary',
         'education',
-        'status',
-        'expertise',
+        'url',
+        'requirement',
+        'type',
     ];
 
     public function user()

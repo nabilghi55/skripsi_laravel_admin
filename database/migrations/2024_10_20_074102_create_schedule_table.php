@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mentorships', function (Blueprint $table) {
+        Schema::disableForeignKeyConstraints();
+
+        Schema::create('schedule', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('mentoring_request_id')->references('id')->on('mentoring_requests');
+            $table->dateTime('schedule_time');
+            $table->tinyInteger('is_booked');
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mentorships');
+        Schema::dropIfExists('schedule');
     }
 };

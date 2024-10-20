@@ -5,20 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Mentor extends Model
+class News extends Model
 {
     use HasFactory;
 
-    protected $table = 'mentor';
+    protected $table = 'news';
 
     protected $fillable = [
         'user_id',
-        'photo',
-        'portfolio',
-        'current_job',
-        'education',
-        'status',
-        'expertise',
+        'slug',
+        'title',
+        'content',
+        'images',
     ];
 
     public function user()

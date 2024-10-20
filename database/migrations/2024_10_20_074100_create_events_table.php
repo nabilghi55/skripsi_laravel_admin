@@ -11,10 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jobs', function (Blueprint $table) {
+        Schema::disableForeignKeyConstraints();
+
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->dateTime('date');
+            $table->string('location');
+            $table->string('description');
+            $table->string('images');
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -22,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('events');
     }
 };
