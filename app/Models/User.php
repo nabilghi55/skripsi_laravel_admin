@@ -53,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobVacancy::class);
     }
+    public function mentee()
+{
+    return $this->hasOne(Mentee::class);
+}
+
 }

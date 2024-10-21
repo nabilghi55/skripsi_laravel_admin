@@ -2,31 +2,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Mentee;
 use App\Models\MenteeRegistration;
 use Auth;
 use Illuminate\Http\Request;
 
 class MenteeRegistrationController extends Controller
 {
-    // View all mentee registrations
     public function index()
     {
-        $registrations = MenteeRegistration::with('user', 'mentor')->get(); // Fetch registrations with user and mentor details
+        $registrations = Mentee::all();
         return view('admin.mentee.registrations.index', compact('registrations'));
     }
     public function store(Request $request)
     {
-        // Validate the request
         $request->validate([
-            'angkatan' => 'required|string|max:50',
-            'hal_yang_ingin_ditanyakan' => 'required|string|max:255',
-            'nomor_hp' => 'required|string|max:15',
+            'question' => 'required|string|max:255',
         ]);
     
-        // Get the authenticated user
         $user = Auth::user();
     
-        // Check if the user is already a mentee or has a pending registration
         if ($user->role === 'mentee') {
             return response()->json([
                 'status' => 'error',
@@ -34,46 +29,37 @@ class MenteeRegistrationController extends Controller
             ], 400);
         }
     
-        // Check if the user has any pending mentee registrations
-        if (MenteeRegistration::where('user_id', $user->id)->where('is_approved', false)->exists()) {
+        if (Mentee::where('user_id', $user->id)->where('status', 'pending')->exists()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Anda memiliki pendaftaran mentee yang belum disetujui.',
             ], 400);
         }
     
-        // Proceed with the registration
-        $registration = MenteeRegistration::create([
+        $mentee = Mentee::create([
             'user_id' => $user->id,
-            'email' => $user->email,
-            'nama' => $user->name,
-            'mentor_id' => null, // Set mentor_id to null initially
-            'angkatan' => $request->angkatan,
-            'hal_yang_ingin_ditanyakan' => $request->hal_yang_ingin_ditanyakan,
-            'nomor_hp' => $request->nomor_hp,
-            'is_approved' => false, // Default to false until approved by admin
+            'status' => 'pending', 
+            'question' => $request->question, 
         ]);
     
         return response()->json([
             'status' => 'success',
             'message' => 'Pendaftaran mentee berhasil!',
-            'data' => $registration,
+            'data' => $mentee,
         ], 201);
     }
     
+    
 
-    // Approve mentee registration
     public function approve($id)
     {
-        $registration = MenteeRegistration::findOrFail($id);
+        $registration = Mentee::findOrFail($id);
         $user = $registration->user; // Get the user associated with the registration
 
-        // Update the user's role to mentee
         $user->role = 'mentee';
         $user->save();
 
-        // Mark the registration as approved
-        $registration->is_approved = true;
+        $registration->status = 'approved';
         $registration->save();
 
         return redirect()->route('admin.mentee.registrations.index')->with('success', 'Mentee registration approved!');

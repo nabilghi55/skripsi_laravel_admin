@@ -40,7 +40,7 @@
         @endif
     </td>
                             <td class="py-3 px-6">{{ $lowongan->salary ?? 'Tidak disebutkan' }}</td>
-                            <td class="py-3 px-6">{{ $lowongan->lokasi }}</td>
+                            <td class="py-3 px-6">{{ $lowongan->location }}</td>
                             <td class="py-3 px-6 flex space-x-2">
                                 <a href="{{ route('admin.lowongan.edit', $lowongan->id) }}" class="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500">Edit</a>
                                 <form action="{{ route('admin.lowongan.destroy', $lowongan->id) }}" method="POST" class="inline-block">

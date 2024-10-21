@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MenteeRegistration;
 use App\Models\MenteeRequest;
+use App\Models\MentoringRequest;
 use Illuminate\Http\Request;
 
 class MenteeRequestController extends Controller
@@ -17,21 +18,58 @@ class MenteeRequestController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'mentor_id' => 'required|exists:mentors,id',
+            'mentor_id' => 'required|exists:mentor,id',
         ]);
-
-        $menteeId = auth()->user()->id; // Get the authenticated mentee's ID
-
-        MenteeRequest::create([
-            'mentee_id' => $menteeId,
+    
+        $user = auth()->user();
+        $mentee = $user->mentee;
+        
+        if ($user->role != 'mentee') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Anda belum terdaftar sebagai mentee.',
+            ], 400);
+        }
+        
+        if (is_null($mentee)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data mentee tidak ditemukan.',
+            ], 400);
+        }
+    
+        $existingRequest = MentoringRequest::where('mentee_id', $mentee->id)
+                                        ->where('mentor_id', $request->mentor_id)
+                                        ->where('status', 'pending')
+                                        ->first();
+    
+        if ($existingRequest) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Anda sudah mengajukan permintaan mentoring ke mentor ini, tunggu sampai di-approve.',
+            ], 400);
+        }
+    
+        $mentoringRequest = MentoringRequest::create([
+            'mentee_id' => $mentee->id,  // Gunakan ID untuk menyimpan
             'mentor_id' => $request->mentor_id,
+            'status' => 'pending',
         ]);
-
         return response()->json([
             'status' => 'success',
-            'message' => 'Mentee request submitted successfully!',
+            'message' => 'Permintaan mentoring berhasil diajukan!',
+            'data' => [
+                'mentee_name' => $mentoringRequest->mentee->user->name,
+                'mentor_name' => $mentoringRequest->mentor->user->name,
+                'status' => $mentoringRequest->status, 
+                ]
         ], 201);
+        
     }
+    
+    
+    
+    
 
     public function approve($id)
     {

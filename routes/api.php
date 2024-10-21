@@ -30,10 +30,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 Route::middleware(['auth:sanctum', 'role:mentor'])->group(function () {
     Route::get('/mentee-requests', [MentorRegistrationController::class, 'listAllMenteeRequests'])->name('mentee.requests');
-
     Route::get('/schedules', [ScheduleController::class, 'index']);
     Route::post('/schedules/{id}/book', [ScheduleController::class, 'book']);
     Route::get('/mentee/listrequests', [MentorRegistrationController::class, 'listAllMenteeRequests']);
+    Route::get('/mentors/{mentorId}/mentee-requests', [MentorRegistrationController::class, 'listMenteeRequests']);
     Route::post('/mentee/requests/{id}/approve', [MentorRegistrationController::class, 'approveMentee']);
 });
 Route::middleware(['auth:sanctum', 'role:mentee'])->group(function () {

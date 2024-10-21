@@ -25,7 +25,7 @@
             <!-- Uploaded By Input -->
             <div class="mb-4">
                 <label for="uploaded_by" class="block text-sm font-medium text-gray-700">Diunggah Oleh</label>
-                <input type="text" name="uploaded_by" id="uploaded_by" value="{{ old('uploaded_by', $berita->uploaded_by) }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500" />
+                <input type="text" name="uploaded_by" id="uploaded_by" value="{{ old('uploaded_by', $berita->user->name) }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500" />
                 @error('uploaded_by')
                     <p class="text-red-500 text-xs italic">{{ $message }}</p>
                 @enderror
@@ -34,9 +34,9 @@
             <!-- Image Upload -->
             <div class="mb-4">
                 <label for="image" class="block text-sm font-medium text-gray-700">Gambar Berita</label>
-                @if($berita->image)
+                @if($berita->images)
                     <div class="mb-2">
-                        <img src="{{ asset('storage/' . $berita->image) }}" alt="{{ $berita->title }}" class="w-1/4 h-auto rounded-lg shadow-lg">
+                        <img src="{{ asset('storage/' . $berita->images) }}" alt="{{ $berita->title }}" class="w-1/4 h-auto rounded-lg shadow-lg">
                     </div>
                 @endif
                 <input type="file" name="image" id="image" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500" />

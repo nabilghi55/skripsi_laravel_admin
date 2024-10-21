@@ -13,7 +13,7 @@
                             <th class="py-3 px-6 text-left">Nama Mentor</th>
                             <th class="py-3 px-6 text-left">Lulusan Tahun</th>
                             <th class="py-3 px-6 text-left">Keahlian</th>
-                            <th class="py-3 px-6 text-left">Kontak Alumni</th>
+                            <th class="py-3 px-6 text-left">Portfolio</th>
                             <th class="py-3 px-6 text-left">Status</th>
                         </tr>
                     </thead>
@@ -22,13 +22,14 @@
                             <tr class="border-b hover:bg-gray-100">
                                 <td class="py-3 px-6">{{ $loop->iteration }}</td>
                                 <td class="py-3 px-6"> <a href="{{ route('admin.mentor.show', $registration->id) }}" class="text-blue-600 hover:underline">
-                                        {{ $registration->nama_mentor }}
+                                        {{ $registration->user->name }}
                                     </a></td>
-                                <td class="py-3 px-6">{{ $registration->lulusan_tahun }}</td>
-                                <td class="py-3 px-6">{{ $registration->keahlian }}</td>
-                                <td class="py-3 px-6">{{ $registration->kontak_alumni }}</td>
+                                <td class="py-3 px-6">{{ $registration->user->graduation }}</td>
+                                <td class="py-3 px-6">{{ $registration->expertise }}</td>
+                                <td class="py-3 px-6">{{ $registration->portfolio }}</td>
                                 <td class="py-3 px-6">
-                                    @if ($registration->is_approved)
+                                @if ($registration->status === 'approved')
+
                                     <div class="flex space-x-5 items-center">
 
                                         <span class="text-green-500 font-semibold">Approved</span>

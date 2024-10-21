@@ -30,13 +30,12 @@
                             <td class="py-3 px-6">{{ $berita->title }}</td>
                             <td class="py-3 px-6">{{ Str::limit($berita->content, 100) }} <!-- Hanya menampilkan 100 karakter dari konten -->
                             </td>
-
-                            <td class="py-3 px-6">{{ $berita->user_id }}</td>
+                            <td class="py-3 px-6">{{ $berita->user->name ?? 'Tidak diketahui' }}</td>
                             <td class="py-3 px-6 flex space-x-2">
                                 <a href="{{ route('admin.berita.show', $berita->slug) }}" class="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500">Lihat</a>
                                 <a href="{{ route('admin.berita.edit', $berita->slug) }}" class="bg-yellow-400 text-white px-4 py-2 rounded hover:bg-yellow-500">edit</a>
 
-                                <form action="{{ route('admin.berita.destroy', $berita->id) }}" method="POST" class="inline-block">
+                                <form action="{{ route('admin.berita.destroy', $berita->slug) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Hapus</button>

@@ -22,13 +22,13 @@
                         @foreach($registrations as $registration)
                             <tr class="border-b hover:bg-gray-100">
                                 <td class="py-3 px-6">{{ $loop->iteration }}</td>
-                                <td class="py-3 px-6">{{ $registration->nama }}</td>
-                                <td class="py-3 px-6">{{ $registration->email }}</td>
-                                <td class="py-3 px-6">{{ $registration->angkatan }}</td>
-                                <td class="py-3 px-6">{{ $registration->hal_yang_ingin_ditanyakan }}</td>
-                                <td class="py-3 px-6">{{ $registration->nomor_hp }}</td>
+                                <td class="py-3 px-6">{{ $registration->user->name }}</td>
+                                <td class="py-3 px-6">{{ $registration->user->email }}</td>
+                                <td class="py-3 px-6">{{ $registration->user->graduation }}</td>
+                                <td class="py-3 px-6">{{ $registration->question }}</td>
+                                <td class="py-3 px-6">{{ $registration->user->phone }}</td>
                                 <td class="py-3 px-6 flex space-x-2">
-                                    @if ($registration->is_approved)
+                                @if ($registration->status === 'approved')
                                         <span class="text-green-500 font-semibold">Approved</span>
                                     @else
                                         <form action="{{ route('admin.mentee.approve', $registration->id) }}" method="POST" class="inline-block">

@@ -15,7 +15,6 @@ class MentoringRequest extends Model
         'mentor_id',
         'mentee_id',
         'status',
-        'schedule_id',
     ];
 
     public function mentor()

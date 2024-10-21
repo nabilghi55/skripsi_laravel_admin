@@ -31,7 +31,7 @@ class BeritaController extends Controller
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             'content' => 'required|string',
         ]);
     
@@ -55,20 +55,19 @@ class BeritaController extends Controller
 
     public function show($slug)
     {
-        $News = News::where('slug', $slug)->firstOrFail();
-        return view('admin.News.show', compact('News'));
+        $berita = News::where('slug', $slug)->firstOrFail();
+        return view('admin.berita.show', compact('berita'));
         
     }
 
-    public function edit(News $News)
+    public function edit(News $berita)
     {
-        return view('admin.News.edit', compact('News'));
+        return view('admin.berita.edit', compact('berita'));
         
     }
 
     public function update(Request $request, News $News)
     {
-        // Validasi input
         $request->validate([
             'title' => 'required|string|max:255',
             'uploaded_by' => 'required|string|max:255',
@@ -76,7 +75,6 @@ class BeritaController extends Controller
             'content' => 'required|string',
         ]);
     
-        // Perbarui slug jika title berubah
         $data = [
             'title' => $request->input('title'),
             'uploaded_by' => $request->input('uploaded_by'),
@@ -84,36 +82,30 @@ class BeritaController extends Controller
             'slug' => Str::slug($request->input('title')), // Update slug dari judul
         ];
     
-        // Proses file gambar jika ada yang diunggah
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($News->image) {
                 Storage::disk('public')->delete($News->image);
             }
     
-            // Upload gambar baru dan dapatkan path-nya
             $path = $request->file('image')->store('images', 'public');
             $data['image'] = $path;
         }
     
-        // Update data News
         $News->update($data);
     
-        // Redirect kembali ke daftar News dengan pesan sukses
-        return redirect()->route('admin.News.index')->with('success', 'News berhasil diupdate.');
+        return redirect()->route('admin.berita.index')->with('success', 'News berhasil diupdate.');
     }
 
     
 
-    public function destroy(News $news)
+    public function destroy(News $berita)
     {
-        if ($news->images) {
-            Storage::disk('public')->delete($news->images);
-        }
-
-        $news->delete();
-        return redirect()->route('admin.berita.index');
+       
+        $berita->delete();
+    
+        return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil dihapus.');
     }
+    
 
     public function getAll()
     {
@@ -127,7 +119,7 @@ class BeritaController extends Controller
         }
     
         $Newss->transform(function ($News) {
-            $News->image = url('storage/' . $News->image); // Assuming images are stored in the 'storage' folder
+            $News->image = url('storage/' . $News->image);
             return $News;
         });
     

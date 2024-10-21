@@ -22,10 +22,14 @@ class AlumniUserSeeder extends Seeder
         //     'role' => 'alumni', // Assign alumni role
         // ]);
         User::create([
-            'name' => 'Gilang S.T M.T PHD',
-            'email' => 'gilang@gmail.com',
+            'name' => 'Alumni',
+            'email' => 'alumni@gmail.com',
             'password' => Hash::make('password123'), // Hash the password
             'role' => 'alumni', // Assign alumni role
+            'address' => 'Jombang', 
+            'graduation' => 2024,
+            'phone'=>'62823867662678',
+            'photo' => 'nabil'
         ]);
     }
 }

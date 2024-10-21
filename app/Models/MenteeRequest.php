@@ -12,7 +12,7 @@ class MenteeRequest extends Model
     protected $fillable = [
         'mentee_id',
         'mentor_id',
-        'is_approved',
+        'status',
     ];
 
     public function mentee()

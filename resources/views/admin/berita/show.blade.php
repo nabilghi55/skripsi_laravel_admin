@@ -7,11 +7,11 @@
  
         <h1 class="text-3xl font-semibold mb-6 text-center">{{ $berita->title }}</h1> <!-- Buat judul di tengah -->
 
-        <p class="text-gray-700 mb-4 text-center">Diunggah oleh: {{ $berita->uploaded_by }}</p> <!-- Informasi pengunggah di tengah -->
+        <p class="text-gray-700 mb-4 text-center">Diunggah oleh: {{ $berita->user->name }}</p> <!-- Informasi pengunggah di tengah -->
 
-        @if ($berita->image)
+        @if ($berita->images)
         <div class="mb-6 flex justify-center"> <!-- Gambar di tengah -->
-            <img src="{{ asset('storage/' . $berita->image) }}" alt="{{ $berita->title }}" class="w-1/2 h-auto rounded-lg shadow-lg"> <!-- Gambar lebih kecil dan ada shadow -->
+            <img src="{{ asset('storage/' . $berita->images) }}" alt="{{ $berita->title }}" class="w-1/2 h-auto rounded-lg shadow-lg"> <!-- Gambar lebih kecil dan ada shadow -->
         </div>
         @endif
 

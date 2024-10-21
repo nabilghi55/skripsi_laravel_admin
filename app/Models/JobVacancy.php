@@ -21,6 +21,7 @@ class JobVacancy extends Model
         'education',
         'url',
         'requirement',
+        'location',
         'type',
     ];
 

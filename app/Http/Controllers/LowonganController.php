@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Lowongan;
+use App\Models\JobVacancy;
 use Illuminate\Http\Request;
 use Storage;
 use Str;
+use Auth;
 
 class LowonganController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:admin')->except(['getAllLowongan', 'getLowonganById', 'index', 'show']);;
+        $this->middleware('role:admin')->except(['getAllLowongan', 'getLowonganById', 'index', 'show']);
     }
 
     public function index()
     {
-        $lowongans = Lowongan::all();
+        $lowongans = JobVacancy::all();
         return view('admin.lowongan.index', compact('lowongans'));
     }
 
@@ -30,13 +31,14 @@ class LowonganController extends Controller
         $validatedData = $request->validate([
             'company_name' => 'required|string|max:255',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', // Validasi logo perusahaan
+            'company_description' => 'nullable|string|max:1000', // Validasi deskripsi perusahaan
             'title' => 'required|string|max:255',
             'salary' => 'nullable|string|max:255',
-            'minimal_pendidikan' => 'required|string|max:255',
-            'persyaratan' => 'required|string',
-            'link_url' => 'required|url',
-            'tipe_kerja' => 'required|string|in:wfo,wfh,hybrid',
-            'lokasi' => 'required|string|max:255',
+            'education' => 'required|string|max:255', // Ganti minimal_pendidikan dengan education
+            'requirement' => 'required|string', // Ganti persyaratan dengan requirement
+            'url' => 'required|url', // Ganti link_url dengan url
+            'type' => 'required|string|in:wfo,wfh,hybrid', // Ganti tipe_kerja dengan type
+            'location' => 'required|string|max:255',
         ]);
     
         $slug = Str::slug($validatedData['title']);
@@ -47,48 +49,49 @@ class LowonganController extends Controller
         }
     
         // Membuat lowongan baru dengan slug dan logo
-        Lowongan::create([
-            'company_name' => $request->input('company_name'),
+        JobVacancy::create([
+            'user_id' => Auth::id(), // Ambil ID user yang sedang login
+            'company_name' => $validatedData['company_name'],
             'company_logo' => $logoPath, // Simpan logo perusahaan
-            'title' => $request->input('title'),
-            'salary' => $request->input('salary'),
-            'minimal_pendidikan' => $request->input('minimal_pendidikan'),
-            'persyaratan' => $request->input('persyaratan'),
-            'link_url' => $request->input('link_url'),
-            'tipe_kerja' => $request->input('tipe_kerja'),
-            'lokasi' => $request->input('lokasi'),
+            'company_description' => $validatedData['company_description'], // Deskripsi perusahaan
+            'title' => $validatedData['title'],
+            'salary' => $validatedData['salary'],
+            'education' => $validatedData['education'], // Pendidikan
+            'requirement' => $validatedData['requirement'], // Persyaratan
+            'url' => $validatedData['url'], // URL
+            'type' => $validatedData['type'], // Tipe kerja
+            'location' => $validatedData['location'], // Lokasi
             'slug' => $slug,
             'uploaded_at' => now(),
         ]);
     
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil ditambahkan.');
     }
-    
-    
 
     public function show($slug)
     {
-        $lowongan = Lowongan::where('slug', $slug)->firstOrFail();
+        $lowongan = JobVacancy::where('slug', $slug)->firstOrFail();
         return view('admin.lowongan.show', compact('lowongan'));
     }
 
-    public function edit(Lowongan $lowongan)
+    public function edit(JobVacancy $lowongan)
     {
         return view('admin.lowongan.edit', compact('lowongan'));
     }
 
-    public function update(Request $request, Lowongan $lowongan)
+    public function update(Request $request, JobVacancy $lowongan)
     {
         $validatedData = $request->validate([
             'company_name' => 'required|string|max:255',
-            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi untuk logo
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'company_description' => 'nullable|string|max:1000', // Deskripsi perusahaan
             'title' => 'required|string|max:255',
             'salary' => 'nullable|string|max:255',
-            'minimal_pendidikan' => 'required|string|max:255',
-            'persyaratan' => 'required|string',
-            'link_url' => 'required|url',
-            'tipe_kerja' => 'required|string|in:wfo,wfh,hybrid',
-            'lokasi' => 'required|string|max:255',
+            'education' => 'required|string|max:255', // Pendidikan
+            'requirement' => 'required|string', // Persyaratan
+            'url' => 'required|url', // URL
+            'type' => 'required|string|in:wfo,wfh,hybrid', // Tipe kerja
+            'location' => 'required|string|max:255',
         ]);
     
         $slug = Str::slug($validatedData['title']);
@@ -108,25 +111,26 @@ class LowonganController extends Controller
         // Update lowongan
         $lowongan->update([
             'company_name' => $validatedData['company_name'],
+            'company_description' => $validatedData['company_description'], // Deskripsi perusahaan
             'title' => $validatedData['title'],
             'salary' => $validatedData['salary'],
-            'minimal_pendidikan' => $validatedData['minimal_pendidikan'],
-            'persyaratan' => $validatedData['persyaratan'],
-            'link_url' => $validatedData['link_url'],
-            'tipe_kerja' => $validatedData['tipe_kerja'],
-            'lokasi' => $validatedData['lokasi'],
+            'education' => $validatedData['education'], // Pendidikan
+            'requirement' => $validatedData['requirement'], // Persyaratan
+            'url' => $validatedData['url'], // URL
+            'type' => $validatedData['type'], // Tipe kerja
+            'location' => $validatedData['location'],
             'slug' => $slug,
         ]);
     
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil diupdate.');
     }
-    
 
-    public function destroy(Lowongan $lowongan)
+    public function destroy(JobVacancy $lowongan)
     {
         $lowongan->delete();
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil dihapus.');
     }
+
     public function getAllLowongan()
     {
         if (!auth()->check()) {
@@ -134,7 +138,7 @@ class LowonganController extends Controller
                 'message' => 'Anda harus login untuk mengakses halaman ini.'
             ], 401);
         }
-        $lowongans = Lowongan::all();
+        $lowongans = JobVacancy::all();
 
         if ($lowongans->isEmpty()) {
             return response()->json([
@@ -149,7 +153,6 @@ class LowonganController extends Controller
         ], 200);
     }
 
-    // Method untuk API - Mengambil detail lowongan berdasarkan ID
     public function getLowonganById($id)
     {
         if (!auth()->check()) {
@@ -157,7 +160,7 @@ class LowonganController extends Controller
                 'message' => 'Anda harus login untuk mengakses halaman ini.'
             ], 401);
         }
-        $lowongan = Lowongan::find($id);
+        $lowongan = JobVacancy::find($id);
 
         if (!$lowongan) {
             return response()->json([
@@ -170,5 +173,4 @@ class LowonganController extends Controller
             'data' => $lowongan
         ], 200);
     }
-    
 }
