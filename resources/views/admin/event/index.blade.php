@@ -28,8 +28,8 @@
                             <tr class="border-b hover:bg-gray-100">
                                 <td class="py-3 px-6">{{ $loop->iteration }}</td> <!-- Nomor Urut -->
                                 <td class="py-3 px-6">{{ $event->title }}</td>
-                                <td class="py-3 px-6">{{ $event->waktu }}</td>
-                                <td class="py-3 px-6">{{ $event->lokasi }}</td>
+                                <td class="py-3 px-6">{{ $event->date }}</td>
+                                <td class="py-3 px-6">{{ $event->location }}</td>
                                 <td class="py-3 px-6 flex space-x-2">
                                 <a href="{{ route('admin.event.registrations', $event) }}" 
                                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">

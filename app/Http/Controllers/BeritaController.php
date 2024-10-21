@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Berita;
+use App\Models\News;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Str;
@@ -15,7 +17,7 @@ class BeritaController extends Controller
 
     public function index()
     {
-        $beritas = Berita::all();
+        $beritas = News::all();
         return view('admin.berita.index', compact('beritas'));
     }
 
@@ -27,10 +29,8 @@ class BeritaController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'uploaded_by' => 'required|string|max:255',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'content' => 'required|string',
         ]);
@@ -39,34 +39,34 @@ class BeritaController extends Controller
     
         $path = $request->file('image')->store('images', 'public');
     
-        // Membuat berita baru dengan slug
-        Berita::create([
+        News::create([
             'title' => $validatedData['title'],
-            'uploaded_by' => $validatedData['uploaded_by'],
-            'image' => $path,
+            'user_id' => Auth::id(), 
+            'images' => $path,
             'content' => $validatedData['content'],
-            'slug' => $slug,  // Pastikan slug diisi
+            'slug' => $slug,
         ]);
     
-        return redirect()->route('admin.berita.index');
+        return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil dibuat!');
     }
+    
     
     
 
     public function show($slug)
     {
-        $berita = Berita::where('slug', $slug)->firstOrFail();
-        return view('admin.berita.show', compact('berita'));
+        $News = News::where('slug', $slug)->firstOrFail();
+        return view('admin.News.show', compact('News'));
         
     }
 
-    public function edit(Berita $berita)
+    public function edit(News $News)
     {
-        return view('admin.berita.edit', compact('berita'));
+        return view('admin.News.edit', compact('News'));
         
     }
 
-    public function update(Request $request, Berita $berita)
+    public function update(Request $request, News $News)
     {
         // Validasi input
         $request->validate([
@@ -87,8 +87,8 @@ class BeritaController extends Controller
         // Proses file gambar jika ada yang diunggah
         if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada
-            if ($berita->image) {
-                Storage::disk('public')->delete($berita->image);
+            if ($News->image) {
+                Storage::disk('public')->delete($News->image);
             }
     
             // Upload gambar baru dan dapatkan path-nya
@@ -96,47 +96,44 @@ class BeritaController extends Controller
             $data['image'] = $path;
         }
     
-        // Update data berita
-        $berita->update($data);
+        // Update data News
+        $News->update($data);
     
-        // Redirect kembali ke daftar berita dengan pesan sukses
-        return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil diupdate.');
+        // Redirect kembali ke daftar News dengan pesan sukses
+        return redirect()->route('admin.News.index')->with('success', 'News berhasil diupdate.');
     }
 
     
 
-    public function destroy(Berita $berita)
+    public function destroy(News $news)
     {
-        // Hapus gambar dari storage jika ada
-        if ($berita->image) {
-            Storage::disk('public')->delete($berita->image);
+        if ($news->images) {
+            Storage::disk('public')->delete($news->images);
         }
 
-        $berita->delete();
+        $news->delete();
         return redirect()->route('admin.berita.index');
     }
 
-    // API Method (Tanpa Middleware untuk akses umum)
     public function getAll()
     {
-        $beritas = Berita::all();
+        $Newss = News::all();
     
-        if ($beritas->isEmpty()) {
+        if ($Newss->isEmpty()) {
             return response()->json([
-                'message' => 'Berita tidak tersedia',
+                'message' => 'News tidak tersedia',
                 'data' => []
             ], 404);
         }
     
-        // Add full URL to the image field
-        $beritas->transform(function ($berita) {
-            $berita->image = url('storage/' . $berita->image); // Assuming images are stored in the 'storage' folder
-            return $berita;
+        $Newss->transform(function ($News) {
+            $News->image = url('storage/' . $News->image); // Assuming images are stored in the 'storage' folder
+            return $News;
         });
     
         return response()->json([
-            'message' => 'Berita berhasil diambil',
-            'data' => $beritas
+            'message' => 'News berhasil diambil',
+            'data' => $Newss
         ], 200);
     }
     
@@ -149,17 +146,17 @@ class BeritaController extends Controller
         ], 401);
     }
 
-    $berita = Berita::where('slug', $slug)->first();
+    $News = News::where('slug', $slug)->first();
 
-    if (!$berita) {
+    if (!$News) {
         return response()->json([
-            'message' => 'Berita tidak ditemukan',
+            'message' => 'News tidak ditemukan',
         ], 404);
     }
 
     return response()->json([
-        'message' => 'Berita berhasil diambil',
-        'data' => $berita
+        'message' => 'News berhasil diambil',
+        'data' => $News
     ], 200);
 }
 

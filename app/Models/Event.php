@@ -12,10 +12,11 @@ class Event extends Model
     protected $table = 'events';
 
     protected $fillable = [
-        'name',
+        'title',
         'description',
         'date',
         'location',
+        'images', // Tambahkan 'images' jika gambar disimpan
     ];
 
     public function registrations()

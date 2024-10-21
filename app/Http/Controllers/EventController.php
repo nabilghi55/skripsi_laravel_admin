@@ -13,8 +13,9 @@ class EventController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('role:admin')->except(['getAllEvents', 'getEventById', 'index', 'show','apiRegister']);;
+        $this->middleware('role:admin')->except(['getAllEvents', 'getEventById', 'index', 'show', 'apiRegister']);
     }
+
     public function index()
     {
         $events = Event::all();
@@ -36,55 +37,58 @@ class EventController extends Controller
     {
         $request->validate([
             'title' => 'required',
-            'waktu' => 'required|date',
-            'lokasi' => 'required',
-            'deskripsi' => 'nullable',
-            'gambar' => 'nullable|image|max:2048',
+            'date' => 'required|date',
+            'location' => 'required',
+            'description' => 'nullable',
+            'images' => 'nullable|image|max:2048',
+        ]);
+    
+        try {
+            $data = $request->all();
+    
+            if ($request->hasFile('images')) {
+                $data['images'] = $request->file('images')->store('events', 'public');
+            }
+    
+            Event::create($data);
+    
+            return redirect()->route('admin.event.index')->with('success', 'Event berhasil dibuat!');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.event.create')->withErrors(['error' => 'Terjadi kesalahan saat menyimpan event.']);
+        }
+    }
+    
+
+    public function edit(Event $event)
+    {
+        $event->date = Carbon::parse($event->date); // Disesuaikan dengan kolom date yang ada di model terbaru
+        return view('admin.event.edit', compact('event'));
+    }
+
+    public function update(Request $request, Event $event)
+    {
+        $request->validate([
+            'title' => 'required',
+            'date' => 'required|date',
+            'location' => 'required',
+            'description' => 'nullable',
+            'images' => 'nullable|image|max:2048',
         ]);
 
         $data = $request->all();
 
-        if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('events', 'public');
+        if ($request->hasFile('images')) {
+            // Hapus gambar lama jika ada
+            if ($event->images && \Storage::exists('public/' . $event->images)) {
+                \Storage::delete('public/' . $event->images);
+            }
+            $data['images'] = $request->file('images')->store('events', 'public');
         }
 
-        Event::create($data);
+        $event->update($data);
 
-        return redirect()->route('admin.event.index')->with('success', 'Event berhasil dibuat!');
+        return redirect()->route('admin.event.index')->with('success', 'Event berhasil diperbarui!');
     }
-
-
-    public function edit(Event $event)
-{
-    $event->waktu = Carbon::parse($event->waktu); 
-    return view('admin.event.edit', compact('event'));
-}
-
-public function update(Request $request, Event $event)
-{
-    $request->validate([
-        'title' => 'required',
-        'waktu' => 'required|date',
-        'lokasi' => 'required',
-        'deskripsi' => 'nullable',
-        'gambar' => 'nullable|image|max:2048',
-    ]);
-
-    $data = $request->all();
-
-    if ($request->hasFile('gambar')) {
-        // Hapus gambar lama jika ada
-        if ($event->gambar && \Storage::exists('public/' . $event->gambar)) {
-            \Storage::delete('public/' . $event->gambar);
-        }
-        $data['gambar'] = $request->file('gambar')->store('events', 'public');
-    }
-
-    $event->update($data);
-
-    return redirect()->route('events.index')->with('success', 'Acara berhasil diperbarui!');
-}
-
 
     /**
      * Display the specified event.
@@ -93,6 +97,7 @@ public function update(Request $request, Event $event)
     {
         return view('admin.event.show', compact('event'));
     }
+
     public function getAllEvents()
     {
         if (!auth()->check()) {
@@ -106,13 +111,15 @@ public function update(Request $request, Event $event)
             'data' => $events
         ], 200);
     }
+
     public function registrations(Event $event)
     {
         // Ambil data pendaftar terkait dengan event
         $registrations = $event->registrations;
-    
+
         return view('admin.event.registrations', compact('event', 'registrations'));
     }
+
     /**
      * API: Get a specific event by ID.
      */
@@ -128,7 +135,7 @@ public function update(Request $request, Event $event)
         if (!$event) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Event not found'
+                'message' => 'Event tidak ditemukan'
             ], 404);
         }
 
@@ -137,27 +144,27 @@ public function update(Request $request, Event $event)
             'data' => $event
         ], 200);
     }
+
     public function apiRegister(Request $request, $eventId)
-{
-    $request->validate([
-        'nama' => 'required|string|max:255',
-        'angkatan' => 'required|string|max:50',
-        'nomor_hp' => 'required|string|max:15',
-    ]);
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'angkatan' => 'required|string|max:50',
+            'nomor_hp' => 'required|string|max:15',
+        ]);
 
-    $event = Event::findOrFail($eventId);
+        $event = Event::findOrFail($eventId);
 
-    $registration = $event->registrations()->create([
-        'nama' => $request->nama,
-        'angkatan' => $request->angkatan,
-        'nomor_hp' => $request->nomor_hp,
-    ]);
+        $registration = $event->registrations()->create([
+            'nama' => $request->nama,
+            'angkatan' => $request->angkatan,
+            'nomor_hp' => $request->nomor_hp,
+        ]);
 
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Pendaftaran berhasil!',
-        'data' => $registration
-    ], 201);
-}
-
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pendaftaran berhasil!',
+            'data' => $registration
+        ], 201);
+    }
 }

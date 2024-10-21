@@ -21,6 +21,10 @@ class AdminAlumniSeeder extends Seeder
             'email' => 'adminalumni@example.com',
             'password' => Hash::make('password123'), // Ganti dengan password yang diinginkan
             'role' => 'admin', // Role khusus admin alumni
+            'address' => 'Jombang', 
+            'graduation' => 2024,
+            'phone'=>'62823867662678',
+            'photo' => 'nabil'
         ]);
     }
 }
